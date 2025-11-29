@@ -3,17 +3,46 @@ import { nanoid } from "nanoid";
 import ContactForm from "./components/ContactForm";
 import ContactList from "./components/ContactList";
 import Filter from "./components/Filter";
-import { initialContacts } from "./data/contactData";
+import styled from "styled-components";
+
+const Wrapper = styled.div`
+  padding: 24px;
+  max-width: 420px;
+  margin: auto;
+  font-family: "Inter", sans-serif;
+  background: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+`;
+
+const SectionTitle = styled.h2`
+  margin-top: 32px;
+  margin-bottom: 12px;
+  font-size: 22px;
+  border-left: 4px solid #4caf50;
+  padding-left: 10px;
+`;
 
 class App extends Component {
   state = {
-    contacts: initialContacts,
+    contacts: [],
     filter: "",
   };
 
+  componentDidMount() {
+    const saved = localStorage.getItem("contacts");
+    if (saved) this.setState({ contacts: JSON.parse(saved) });
+  }
+
+  componentDidUpdate(_, prevState) {
+    if (prevState.contacts !== this.state.contacts) {
+      localStorage.setItem("contacts", JSON.stringify(this.state.contacts));
+    }
+  }
+
   addContact = (name, number) => {
     this.setState(prev => ({
-      contacts: [...prev.contacts, { id: nanoid(), name, number }]
+      contacts: [...prev.contacts, { id: nanoid(), name, number }],
     }));
   };
 
@@ -21,7 +50,7 @@ class App extends Component {
 
   deleteContact = id => {
     this.setState(prev => ({
-      contacts: prev.contacts.filter(c => c.id !== id)
+      contacts: prev.contacts.filter(c => c.id !== id),
     }));
   };
 
@@ -33,16 +62,17 @@ class App extends Component {
   };
 
   render() {
-    const filteredContacts = this.getFilteredContacts();
+    const filtered = this.getFilteredContacts();
 
     return (
-      <div style={{ padding: "20px" }}>
+      <Wrapper>
         <h1>Phonebook</h1>
         <ContactForm onAdd={this.addContact} />
-        <h2>Contacts</h2>
+
+        <SectionTitle>Contacts</SectionTitle>
         <Filter value={this.state.filter} onChange={this.changeFilter} />
-        <ContactList contacts={filteredContacts} onDelete={this.deleteContact} />
-      </div>
+        <ContactList contacts={filtered} onDelete={this.deleteContact} />
+      </Wrapper>
     );
   }
 }

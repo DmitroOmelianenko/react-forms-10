@@ -1,20 +1,19 @@
 import React from "react";
+import styled from "styled-components";
 import ContactItem from "./ContactItem";
 
-function ContactList({ contacts, onDelete }) {
+const List = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin-top: 12px;
+`;
+
+export default function ContactList({ contacts, onDelete }) {
   return (
-    <ul>
-      {contacts.map((c) => (
-        <ContactItem
-          key={c.id}
-          id={c.id}
-          name={c.name}
-          number={c.number}
-          onDelete={onDelete}
-        />
+    <List>
+      {contacts.map(c => (
+        <ContactItem key={c.id} {...c} onDelete={onDelete} />
       ))}
-    </ul>
+    </List>
   );
 }
-
-export default ContactList;
